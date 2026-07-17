@@ -15,11 +15,13 @@ export function GrantRow({ grant, traitById, traits, onChange, onRemove }: {
   const { locale, t: translate } = useI18n();
   const [picking, setPicking] = useState(false);
   const t = grant.traitId ? traitById.get(grant.traitId) ?? null : null;
+  const isReplaceable = !grant.traitLocked;
   return (
-    <div className="grant-row">
+    <div className={`grant-row ${isReplaceable ? 'grant-row-replaceable' : 'grant-row-fixed'}`}>
       {grant.slotLabel && <span className={'grant-slot slot-' + grant.slotLabel.toLowerCase()}>{grant.slotLabel}</span>}
       <button className="sec-pick" disabled={grant.traitLocked} onClick={() => { if (!grant.traitLocked) setPicking(true); }}>
-        {t ? <><TraitIcon trait={t} size={22} /><span>{localizedName(locale, t.name, t.nameZh)}</span></> : <span className="dim">{translate('selectTrait')}</span>}
+        {t ? <><TraitIcon trait={t} size={22} /><span className="grant-trait-name">{localizedName(locale, t.name, t.nameZh)}</span></> : <span className="dim grant-trait-name">{translate('selectTrait')}</span>}
+        <span className="grant-mode">{isReplaceable ? (locale === 'zh' ? '可替换' : 'Editable') : (locale === 'zh' ? '固定' : 'Fixed')}</span>
       </button>
       <label className="lv small">
         Lv

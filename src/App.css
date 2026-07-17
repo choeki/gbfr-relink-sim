@@ -231,6 +231,33 @@ select.text-input { cursor: pointer; }
 .sec-pick span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .grant-row { display: flex; align-items: center; gap: 8px; margin: 7px 0; }
+.grant-row .sec-pick { min-height: 39px; }
+.grant-trait-name { flex: 1; min-width: 0; text-align: left; }
+.grant-mode {
+  flex: none; margin-left: auto; padding: 2px 7px; border-radius: 999px;
+  font-size: 9px; font-weight: 700; letter-spacing: .3px;
+}
+.grant-row-fixed .sec-pick {
+  background: rgba(239, 232, 214, .62);
+  border-color: rgba(119, 98, 67, .18);
+  box-shadow: inset 3px 0 0 rgba(119, 98, 67, .22);
+}
+.grant-row-fixed .grant-mode {
+  color: var(--dim); background: rgba(104, 91, 71, .08);
+  border: 1px solid rgba(104, 91, 71, .12);
+}
+.grant-row-replaceable .sec-pick {
+  background: linear-gradient(90deg, rgba(218, 238, 247, .82), rgba(244, 239, 223, .82));
+  border-color: rgba(54, 123, 163, .45);
+  box-shadow: inset 3px 0 0 rgba(54, 123, 163, .72), 0 1px 3px rgba(42, 85, 113, .09);
+}
+.grant-row-replaceable .sec-pick:hover {
+  border-color: var(--accent); background: linear-gradient(90deg, rgba(205, 235, 249, .95), rgba(247, 240, 220, .9));
+}
+.grant-row-replaceable .grant-mode {
+  color: #2f759b; background: rgba(70, 151, 190, .11);
+  border: 1px solid rgba(54, 123, 163, .22);
+}
 
 /* ================= skill summary ================= */
 .summary { position: sticky; top: 88px; max-height: calc(100vh - 145px); overflow-y: auto; }
