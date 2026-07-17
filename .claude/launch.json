@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "gbfr-relink-sim",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "D:/peizhuang/gbfr-relink-sim",
+      "port": 5173
+    }
+  ]
+}
