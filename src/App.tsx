@@ -55,14 +55,24 @@ export default function App() {
         const def = data.wrightstones.find(candidate => candidate.id === next.wrightstone.defId);
         if (def) {
           const traits = [...next.wrightstone.traits];
-          traits[0] = { traitId: def.defaultTraitId, level: traits[0]?.level ?? 20 };
+          traits[0] = {
+            traitId: def.defaultTraitId,
+            level: traits[0]?.level ?? 20,
+            traitLocked: true,
+            removable: false,
+          };
           next = { ...next, wrightstone: { ...next.wrightstone, traits } };
         }
       }
       if (next.wrightstone.defId) {
         const traits = next.wrightstone.traits.map((grant, index) => {
+          const normalizedGrant = index === 0 && (!grant.traitLocked || grant.removable !== false)
+            ? { ...grant, traitLocked: true, removable: false }
+            : grant;
           const trait = grant.traitId ? data.traits.find(candidate => candidate.id === grant.traitId) : null;
-          return !trait || isWrightstoneTraitAllowed(trait, index) ? grant : { ...grant, traitId: null };
+          return !trait || isWrightstoneTraitAllowed(trait, index)
+            ? normalizedGrant
+            : { ...normalizedGrant, traitId: null };
         });
         if (traits.some((grant, index) => grant !== next.wrightstone.traits[index])) {
           next = { ...next, wrightstone: { ...next.wrightstone, traits } };

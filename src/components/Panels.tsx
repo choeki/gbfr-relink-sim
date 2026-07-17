@@ -136,7 +136,12 @@ export function WrightstonePanel({ build, data, traitById, onChange }: {
           const def = data.wrightstones.find(x => x.id === defId);
           if (def) {
             const traits = [...ws.traits];
-            traits[0] = { traitId: def.defaultTraitId, level: traits[0]?.level ?? 20 };
+            traits[0] = {
+              traitId: def.defaultTraitId,
+              level: traits[0]?.level ?? 20,
+              traitLocked: true,
+              removable: false,
+            };
             set({ defId, traits });
           } else {
             set({ defId });
@@ -153,7 +158,9 @@ export function WrightstonePanel({ build, data, traitById, onChange }: {
           <div className="panel-hint">{t('wrightstoneHint')}</div>
           {ws.traits.map((g, i) => (
             <GrantRow
-              key={i} grant={g} traitById={traitById}
+              key={i}
+              grant={i === 0 ? { ...g, traitLocked: true, removable: false } : g}
+              traitById={traitById}
               traits={data.traits.filter(t => isWrightstoneTraitAllowed(t, i))}
               onChange={ng => set({ traits: ws.traits.map((x, j) => (j === i ? ng : x)) })}
               onRemove={() => set({ traits: ws.traits.map((x, j) => (j === i ? { traitId: null, level: x.level } : x)) })}

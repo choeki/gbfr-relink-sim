@@ -163,7 +163,7 @@ export function emptyBuild(): Build {
     name: '新配装',
     characterId: null,
     weapon: { defId: null, name: '', grants: [] },
-    wrightstone: { defId: null, traits: [{ traitId: null, level: 20 }, { traitId: null, level: 15 }, { traitId: null, level: 10 }] },
+    wrightstone: { defId: null, traits: [{ traitId: null, level: 20, traitLocked: true, removable: false }, { traitId: null, level: 15 }, { traitId: null, level: 10 }] },
     sigils: Array.from({ length: SIGIL_SLOTS }, () => ({ sigilId: null, level: 15, secondaryTraitId: null, secondaryLevel: null })),
     summons: Array.from({ length: SUMMON_SLOTS }, emptySummon),
   };
