@@ -9,7 +9,7 @@ import { SummonPanel } from './components/SummonPanel';
 import { CharacterPanel } from './components/CharacterPanel';
 import { computeSkills, computeSummonBonuses, SkillSummary } from './components/SkillSummary';
 import { adaptBuildToCharacter } from './characterAdaptation';
-import { isSummonTraitAllowed, isWrightstoneTraitAllowed, summonTraitLevel, WRIGHTSTONE_PRIMARY_TRAIT_SET } from './rules';
+import { isSummonSubParamAllowed, isSummonTraitAllowed, isWrightstoneTraitAllowed, summonTraitLevel, WRIGHTSTONE_PRIMARY_TRAIT_SET } from './rules';
 import { useI18n } from './i18n';
 import { exportBuildImage } from './exportBuildImage';
 
@@ -79,11 +79,18 @@ export default function App() {
         }
       }
       const summons = next.summons.map(summon => {
-        if (!summon.trait.traitId) return summon;
-        const trait = data.traits.find(candidate => candidate.id === summon.trait.traitId);
-        if (!trait || !isSummonTraitAllowed(trait)) return { ...summon, trait: { ...summon.trait, traitId: null } };
-        const level = summonTraitLevel(trait, summon.trait.level);
-        return level === summon.trait.level ? summon : { ...summon, trait: { ...summon.trait, level } };
+        const def = data.summons.find(candidate => candidate.id === summon.defId);
+        const trait = summon.trait.traitId ? data.traits.find(candidate => candidate.id === summon.trait.traitId) : null;
+        const param = summon.sub.paramId ? data.subParams.find(candidate => candidate.id === summon.sub.paramId) : null;
+        const traitAllowed = !trait || isSummonTraitAllowed(trait, def?.baseName);
+        const paramAllowed = !param || isSummonSubParamAllowed(param, def?.baseName);
+        const level = trait ? summonTraitLevel(trait, summon.trait.level) : summon.trait.level;
+        if (traitAllowed && paramAllowed && level === summon.trait.level) return summon;
+        return {
+          ...summon,
+          trait: traitAllowed ? { ...summon.trait, level } : { ...summon.trait, traitId: null },
+          sub: paramAllowed ? summon.sub : { ...summon.sub, paramId: null },
+        };
       });
       if (summons.some((summon, index) => summon !== next.summons[index])) {
         next = { ...next, summons };

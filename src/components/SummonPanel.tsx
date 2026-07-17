@@ -4,7 +4,7 @@ import { SUMMON_SLOTS, emptySummon } from '../types';
 import { TraitIcon } from '../icons';
 import { localizedName, useI18n } from '../i18n';
 import { TraitPicker } from './Picker';
-import { isSummonTraitAllowed, SUMMON_ALWAYS_MAX_TRAIT_IDS, summonTraitLevel } from '../rules';
+import { isSummonSubParamAllowed, isSummonTraitAllowed, SUMMON_ALWAYS_MAX_TRAIT_IDS, summonTraitLevel } from '../rules';
 
 function SummonPicker({ summons, onPick, onClose }: {
   summons: SummonDef[];
@@ -62,6 +62,19 @@ function SummonSlot({ index, equip, data, traitById, onChange }: {
   const def = equip.defId ? data.summons.find(s => s.id === equip.defId) ?? null : null;
   const param = equip.sub.paramId ? data.subParams.find(x => x.id === equip.sub.paramId) ?? null : null;
   const trait = equip.trait.traitId ? traitById.get(equip.trait.traitId) ?? null : null;
+  const allowedSubParams = data.subParams.filter(item => isSummonSubParamAllowed(item, def?.baseName));
+
+  const changeSummon = (summon: SummonDef) => {
+    const keepTrait = trait && isSummonTraitAllowed(trait, summon.baseName);
+    const keepParam = param && isSummonSubParamAllowed(param, summon.baseName);
+    onChange({
+      ...equip,
+      defId: summon.id,
+      trait: keepTrait ? equip.trait : { traitId: null, level: 1 },
+      sub: keepParam ? equip.sub : { paramId: null, level: equip.sub.level },
+    });
+    setPickingSummon(false);
+  };
 
   if (!def) {
     return (
@@ -70,7 +83,7 @@ function SummonSlot({ index, equip, data, traitById, onChange }: {
         {pickingSummon && (
           <SummonPicker
             summons={data.summons}
-            onPick={summon => { onChange({ ...equip, defId: summon.id }); setPickingSummon(false); }}
+            onPick={changeSummon}
             onClose={() => setPickingSummon(false)}
           />
         )}
@@ -112,7 +125,7 @@ function SummonSlot({ index, equip, data, traitById, onChange }: {
             onChange={event => onChange({ ...equip, sub: { ...equip.sub, paramId: event.target.value || null } })}
           >
             <option value="">{t('chooseAttribute')}</option>
-            {data.subParams.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+            {allowedSubParams.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
           </select>
           {param && (
             <>
@@ -131,14 +144,14 @@ function SummonSlot({ index, equip, data, traitById, onChange }: {
       {pickingSummon && (
         <SummonPicker
           summons={data.summons}
-          onPick={summon => { onChange({ ...equip, defId: summon.id }); setPickingSummon(false); }}
+          onPick={changeSummon}
           onClose={() => setPickingSummon(false)}
         />
       )}
       {pickingTrait && (
         <TraitPicker
           title={t('selectTrait')}
-          traits={data.traits.filter(isSummonTraitAllowed)}
+          traits={data.traits.filter(candidate => isSummonTraitAllowed(candidate, def.baseName))}
           onPick={picked => {
             onChange({ ...equip, trait: { traitId: picked.id, level: summonTraitLevel(picked, Math.max(1, equip.trait.level)) } });
             setPickingTrait(false);

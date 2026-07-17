@@ -99,6 +99,14 @@ async function drawIcon(ctx: CanvasRenderingContext2D, src: string | null, x: nu
 function sectionTitle(ctx: CanvasRenderingContext2D, label: string, count: string, y: number) {
   text(ctx, `◆  ${label}`, MARGIN + 20, y + 31, 29, GOLD, 800);
   text(ctx, count, WIDTH - MARGIN - 20, y + 31, 20, DIM, 600, 'right');
+  ctx.save();
+  ctx.strokeStyle = 'rgba(128,91,48,.24)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(MARGIN + 245, y + 32);
+  ctx.lineTo(WIDTH - MARGIN - 82, y + 32);
+  ctx.stroke();
+  ctx.restore();
 }
 
 function safeFileName(value: string) {
@@ -158,26 +166,47 @@ export async function exportBuildImage({ build, data, traitById, sigilById, skil
   const weaponX = MARGIN + overviewWidth + overviewGap;
   panel(ctx, weaponX, overviewY, overviewWidth, 205);
   text(ctx, locale === 'zh' ? '武器' : 'Weapon', weaponX + 20, overviewY + 30, 25, GOLD, 800);
-  text(ctx, weapon ? (locale === 'zh' ? weapon.seriesZh || weapon.series || '' : weapon.series || weapon.seriesZh || '') : (locale === 'zh' ? '未装备' : 'Unequipped'), weaponX + 20, overviewY + 64, 22, TEXT, 800);
+  text(ctx, weapon ? (locale === 'zh' ? weapon.seriesZh || weapon.series || '' : weapon.series || weapon.seriesZh || '') : (locale === 'zh' ? '未装备' : 'Unequipped'), weaponX + 20, overviewY + 62, 21, TEXT, 800);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(128,91,48,.18)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(weaponX + 20, overviewY + 80);
+  ctx.lineTo(weaponX + overviewWidth - 20, overviewY + 80);
+  ctx.stroke();
+  ctx.restore();
   for (const [index, grant] of build.weapon.grants.slice(0, 5).entries()) {
     const trait = grant.traitId ? traitById.get(grant.traitId) : null;
     const label = trait ? localizedName(locale, trait.name, trait.nameZh) : '—';
-    const rowY = overviewY + 96 + index * 24;
-    await drawIcon(ctx, traitIconSource(trait), weaponX + 20, rowY - 10, 21);
-    text(ctx, `${grant.slotLabel || index + 1}`, weaponX + 50, rowY, 14, DIM, 700);
-    text(ctx, fitText(ctx, label, overviewWidth - 160), weaponX + 82, rowY, 16, TEXT, 600);
-    text(ctx, `Lv${grant.level}`, weaponX + overviewWidth - 18, rowY, 15, GOLD, 800, 'right');
+    const rowY = overviewY + 95 + index * 21;
+    await drawIcon(ctx, traitIconSource(trait), weaponX + 20, rowY - 9, 19);
+    text(ctx, `${grant.slotLabel || index + 1}`, weaponX + 48, rowY, 13, DIM, 700);
+    text(ctx, fitText(ctx, label, overviewWidth - 160), weaponX + 80, rowY, 15, TEXT, 600);
+    text(ctx, `Lv${grant.level}`, weaponX + overviewWidth - 18, rowY, 14, GOLD, 800, 'right');
   }
 
   const stoneX = weaponX + overviewWidth + overviewGap;
   panel(ctx, stoneX, overviewY, overviewWidth, 205);
   text(ctx, locale === 'zh' ? '祝福石' : 'Wrightstone', stoneX + 20, overviewY + 30, 25, GOLD, 800);
-  text(ctx, wrightstone ? localizedName(locale, wrightstone.name, wrightstone.nameZh) : (locale === 'zh' ? '未装备' : 'Unequipped'), stoneX + 20, overviewY + 70, 25, TEXT, 800);
-  build.wrightstone.traits.forEach((grant, index) => {
+  text(ctx, wrightstone ? localizedName(locale, wrightstone.name, wrightstone.nameZh) : (locale === 'zh' ? '未装备' : 'Unequipped'), stoneX + 20, overviewY + 65, 22, TEXT, 800);
+  ctx.save();
+  ctx.strokeStyle = 'rgba(128,91,48,.18)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(stoneX + 20, overviewY + 84);
+  ctx.lineTo(stoneX + overviewWidth - 20, overviewY + 84);
+  ctx.stroke();
+  ctx.restore();
+  for (const [index, grant] of build.wrightstone.traits.entries()) {
     const trait = grant.traitId ? traitById.get(grant.traitId) : null;
-    if (!trait) return;
-    text(ctx, `${index + 1}. ${localizedName(locale, trait.name, trait.nameZh)}  Lv${grant.level}`, stoneX + 20, overviewY + 112 + index * 30, 18, TEXT, 500);
-  });
+    if (!trait) continue;
+    const rowY = overviewY + 105 + index * 29;
+    text(ctx, `${index + 1}.`, stoneX + 20, rowY, 16, DIM, 600);
+    await drawIcon(ctx, traitIconSource(trait), stoneX + 48, rowY - 13, 26);
+    ctx.font = `600 16px "Microsoft YaHei", sans-serif`;
+    text(ctx, fitText(ctx, localizedName(locale, trait.name, trait.nameZh), overviewWidth - 190), stoneX + 82, rowY, 16, TEXT, 600);
+    text(ctx, `Lv${grant.level}`, stoneX + overviewWidth - 18, rowY, 15, GOLD, 700, 'right');
+  }
 
   let y = 400;
   sectionTitle(ctx, locale === 'zh' ? '因子' : 'Sigils', `${build.sigils.filter(item => item.sigilId).length}/12`, y);
@@ -203,8 +232,21 @@ export async function exportBuildImage({ build, data, traitById, sigilById, skil
     text(ctx, name, x + 84, cardY + 32, 21, TEXT, 800);
     text(ctx, `Lv${equip.level}`, x + sigilWidth - 18, cardY + 32, 18, GOLD, 800, 'right');
     const secondary = equip.secondaryTraitId ? traitById.get(equip.secondaryTraitId) : null;
-    const secondaryText = secondary ? `${localizedName(locale, secondary.name, secondary.nameZh)}  Lv${equip.secondaryLevel ?? equip.level}` : '—';
-    text(ctx, `${locale === 'zh' ? '副词条' : 'Secondary'}  ${secondaryText}`, x + 84, cardY + 69, 17, DIM, 500);
+    const secondaryLabel = locale === 'zh' ? '副词条' : 'Secondary';
+    text(ctx, secondaryLabel, x + 84, cardY + 69, 17, DIM, 500);
+    ctx.font = `500 17px "Microsoft YaHei", sans-serif`;
+    const secondaryIconX = x + 84 + ctx.measureText(secondaryLabel).width + 10;
+    if (secondary) {
+      await drawIcon(ctx, traitIconSource(secondary), secondaryIconX, cardY + 50, 28);
+      const secondaryNameX = secondaryIconX + 36;
+      const secondaryLevel = `Lv${equip.secondaryLevel ?? equip.level}`;
+      ctx.font = `500 17px "Microsoft YaHei", sans-serif`;
+      const availableNameWidth = x + sigilWidth - 18 - secondaryNameX - ctx.measureText(secondaryLevel).width - 12;
+      text(ctx, fitText(ctx, localizedName(locale, secondary.name, secondary.nameZh), availableNameWidth), secondaryNameX, cardY + 69, 17, DIM, 500);
+      text(ctx, secondaryLevel, x + sigilWidth - 18, cardY + 69, 17, DIM, 500, 'right');
+    } else {
+      text(ctx, '—', secondaryIconX, cardY + 69, 17, DIM, 500);
+    }
   }
   y += sigilRows * 112 + 10;
 

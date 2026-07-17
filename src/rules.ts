@@ -69,16 +69,42 @@ export const SUMMON_FORBIDDEN_TRAIT_IDS = new Set<string>([
   'GAME_DARK_AMITY',
 ]);
 
+/**
+ * These traits are not guaranteed rolls. They may appear only on the listed
+ * summon families, alongside the normal summon trait pool.
+ */
+export const SUMMON_EXCLUSIVE_TRAIT_OWNERS: Readonly<Record<string, readonly string[]>> = {
+  SKILL_044_00: ['火龙布雷扎莱克', '贝希摩斯'], // Stout Heart
+  SKILL_141_00: ['小钳蟹'], // Crabvestment Returns
+  SKILL_146_00: ['罗兰'], // War Elemental
+  SKILL_233_00: ['路西法'], // Berserker
+  SKILL_234_00: ['别西卜'], // Spartan
+};
+
+export const SUMMON_HIGH_PARAM_FAMILIES = new Set<string>([
+  '罗兰',
+  '莉莉丝',
+  '别西卜',
+  '路西法',
+]);
+
 export function isSummonTraitAllowed(trait: {
   id: string;
   canPrimary: boolean;
   weaponOnly?: boolean;
   iconFile?: string;
-}): boolean {
-  return trait.canPrimary
+}, summonBaseName?: string): boolean {
+  const owners = SUMMON_EXCLUSIVE_TRAIT_OWNERS[trait.id];
+  return (!owners || (!!summonBaseName && owners.includes(summonBaseName)))
+    && trait.canPrimary
     && !trait.weaponOnly
     && !trait.iconFile?.startsWith('chars/')
     && !SUMMON_FORBIDDEN_TRAIT_IDS.has(trait.id);
+}
+
+export function isSummonSubParamAllowed(param: { name: string }, summonBaseName?: string): boolean {
+  return !param.name.includes('（高')
+    || (!!summonBaseName && SUMMON_HIGH_PARAM_FAMILIES.has(summonBaseName));
 }
 
 export const SUMMON_ALWAYS_MAX_TRAIT_IDS = new Set<string>([
