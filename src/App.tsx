@@ -13,9 +13,20 @@ import { isSummonSubParamAllowed, isSummonTraitAllowed, isWrightstoneTraitAllowe
 import { useI18n } from './i18n';
 import { exportBuildImage } from './exportBuildImage';
 
+const LEGACY_TRAIT_IDS: Record<string, string> = {
+  GAME_BLADE_DANCE: 'SKILL_158_00',
+};
+
+function canonicalTraitId(traitId: string | null): string | null {
+  return traitId ? (LEGACY_TRAIT_IDS[traitId] ?? traitId) : null;
+}
+
 function normalizeBuild(b: Build): Build {
   const base = emptyBuild();
-  const sigils = [...(b.sigils ?? [])].slice(0, SIGIL_SLOTS);
+  const sigils = [...(b.sigils ?? [])].slice(0, SIGIL_SLOTS).map(sigil => ({
+    ...sigil,
+    secondaryTraitId: canonicalTraitId(sigil.secondaryTraitId),
+  }));
   while (sigils.length < SIGIL_SLOTS) sigils.push({ sigilId: null, level: 15, secondaryTraitId: null, secondaryLevel: null });
   const summons = [...(b.summons ?? [])].slice(0, SUMMON_SLOTS).map(s => {
     const legacy = (s as unknown as { subs?: { paramId: string | null; level: number }[] }).subs;
@@ -23,17 +34,30 @@ function normalizeBuild(b: Build): Build {
     const trait = s.trait ?? { traitId: null, level: 1 };
     return {
       defId: s.defId ?? null,
-      trait: { traitId: trait.traitId ?? null, level: trait.level ?? 1 },
+      trait: { traitId: canonicalTraitId(trait.traitId ?? null), level: trait.level ?? 1 },
       sub: { paramId: sub.paramId ?? null, level: sub.level ?? 9 },
     };
   });
   while (summons.length < SUMMON_SLOTS) summons.push(emptySummon());
   const wrightstone = { ...base.wrightstone, ...b.wrightstone };
+  wrightstone.traits = wrightstone.traits.map(trait => ({
+    ...trait,
+    traitId: canonicalTraitId(trait.traitId),
+  }));
   if (wrightstone.traits.map(t => t.level).join(',') === '10,7,5') {
     const levels = [20, 15, 10];
     wrightstone.traits = wrightstone.traits.map((trait, index) => ({ ...trait, level: levels[index] }));
   }
-  return { ...base, ...b, sigils, summons, weapon: { ...base.weapon, ...b.weapon }, wrightstone };
+  const weapon = {
+    ...base.weapon,
+    ...b.weapon,
+    grants: (b.weapon?.grants ?? []).map(grant => ({
+      ...grant,
+      traitId: canonicalTraitId(grant.traitId),
+      allowedTraitIds: grant.allowedTraitIds?.map(id => canonicalTraitId(id) ?? id),
+    })),
+  };
+  return { ...base, ...b, sigils, summons, weapon, wrightstone };
 }
 
 export default function App() {

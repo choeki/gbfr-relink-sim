@@ -1588,7 +1588,7 @@
    "hash": "0xA8A3163B",
    "name": "Glass Cannon",
    "nameZh": "刀上舞",
-   "maxLevel": 15,
+   "maxLevel": 30,
    "canPrimary": true,
    "canSecondary": true,
    "iconFile": "Cmn_icskill_02_08.png",
@@ -2507,19 +2507,6 @@
     "最大生命值不超过 200000 时\n攻击力 +70% / 伤害上限 +500%"
    ],
    "levelDataSource": "游戏截图 · 部分数据",
-   "category": "attack"
-  },
-  {
-   "id": "GAME_BLADE_DANCE",
-   "hash": "",
-   "name": "Blade Dance",
-   "nameZh": "刃上舞",
-   "maxLevel": 30,
-   "canPrimary": false,
-   "canSecondary": false,
-   "weaponOnly": true,
-   "iconFile": "Game_skill_blade_dance.png",
-   "desc": "武器可替换技能；具体效果等待补充。",
    "category": "attack"
   },
   {
