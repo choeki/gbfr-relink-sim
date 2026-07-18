@@ -399,7 +399,7 @@
     },
     "Glass Cannon": {
       "minLevel": 1,
-      "maxLevel": 15,
+      "maxLevel": 30,
       "effects": [
         "ATK +2%\nDMG cap +2%",
         "ATK +4%\nDMG cap +4%",
@@ -415,7 +415,22 @@
         "ATK +24%\nDMG cap +24%",
         "ATK +26%\nDMG cap +26%",
         "ATK +28%\nDMG cap +28%",
-        "ATK +30%\nDMG cap +30%"
+        "ATK +30%\nDMG cap +30%",
+        "ATK +32%\nDMG cap +32%",
+        "ATK +34%\nDMG cap +34%",
+        "ATK +36%\nDMG cap +36%",
+        "ATK +38%\nDMG cap +38%",
+        "ATK +40%\nDMG cap +40%",
+        "ATK +41%\nDMG cap +41%",
+        "ATK +42%\nDMG cap +42%",
+        "ATK +43%\nDMG cap +43%",
+        "ATK +44%\nDMG cap +44%",
+        "ATK +45%\nDMG cap +45%",
+        "ATK +46%\nDMG cap +46%",
+        "ATK +47%\nDMG cap +47%",
+        "ATK +48%\nDMG cap +48%",
+        "ATK +49%\nDMG cap +49%",
+        "ATK +50%\nDMG cap +50%"
       ]
     },
     "Injury to Insult": {

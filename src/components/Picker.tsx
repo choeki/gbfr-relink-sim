@@ -29,7 +29,13 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
 function SearchInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const { t } = useI18n();
   const ref = useRef<HTMLInputElement>(null);
-  useEffect(() => { ref.current?.focus(); }, []);
+  useEffect(() => {
+    // Opening a picker should not summon the virtual keyboard on phones/tablets.
+    // Keep the convenient desktop autofocus for precise pointer devices.
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      ref.current?.focus();
+    }
+  }, []);
   return (
     <input ref={ref} className="search" placeholder={t('searchName')} value={value} onChange={e => onChange(e.target.value)} />
   );

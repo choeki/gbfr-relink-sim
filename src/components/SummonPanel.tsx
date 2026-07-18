@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Build, Dataset, SummonDef, SummonEquip, Trait } from '../types';
 import { SUMMON_SLOTS, emptySummon } from '../types';
 import { TraitIcon } from '../icons';
@@ -12,6 +12,7 @@ function SummonPicker({ summons, onPick, onClose }: {
   onClose: () => void;
 }) {
   const [query, setQuery] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
   const { t } = useI18n();
   const filtered = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase();
@@ -25,6 +26,12 @@ function SummonPicker({ summons, onPick, onClose }: {
     return () => window.removeEventListener('keydown', closeOnEscape);
   }, [onClose]);
 
+  useEffect(() => {
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      searchRef.current?.focus();
+    }
+  }, []);
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal summon-picker-modal" onClick={event => event.stopPropagation()}>
@@ -32,7 +39,7 @@ function SummonPicker({ summons, onPick, onClose }: {
           <span>{t('selectSummon')}</span>
           <button className="btn-ghost" onClick={onClose}>×</button>
         </div>
-        <input className="search" autoFocus placeholder={t('searchSummon')} value={query} onChange={event => setQuery(event.target.value)} />
+        <input ref={searchRef} className="search" placeholder={t('searchSummon')} value={query} onChange={event => setQuery(event.target.value)} />
         <div className="summon-picker-grid">
           {filtered.map(summon => (
             <button key={summon.id} className="picker-item summon-picker-item" onClick={() => onPick(summon)}>

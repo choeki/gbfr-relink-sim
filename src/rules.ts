@@ -59,9 +59,6 @@ export const SUMMON_FORBIDDEN_TRAIT_IDS = new Set<string>([
   'SKILL_142_00', // Seven Net
   'SKILL_156_00', // Potent Greens
   'SKILL_159_00', // Flight over Fight
-  'SKILL_160_00', // Alpha
-  'SKILL_161_00', // Beta
-  'SKILL_162_00', // Gamma
   'SKILL_164_00', // Crabmiration
   'SKILL_167_00', // Auto Potion
   'WIKI_IMMORTAL_SHELL',
