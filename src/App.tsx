@@ -70,6 +70,7 @@ export default function App() {
   const [build, setBuild] = useState<Build>(() => normalizeBuild(loadCurrent() ?? emptyBuild()));
   const [builds, setBuilds] = useState(loadBuilds);
   const [exporting, setExporting] = useState(false);
+  const [mobileHeaderHidden, setMobileHeaderHidden] = useState(false);
   const masteryStyles = getMasterTraitStyles(build.characterId);
   const data = useMemo(() => mergeDataset(custom), [custom]);
   const traitById = useMemo(() => new Map(data.traits.map(trait => [trait.id, trait])), [data]);
@@ -130,13 +131,61 @@ export default function App() {
 
   useEffect(() => { document.title = t('appTitle'); }, [t]);
 
+  useEffect(() => {
+    const mobileQuery = window.matchMedia('(max-width: 800px)');
+    let lastScrollY = Math.max(window.scrollY, 0);
+
+    const updateHeader = () => {
+      if (!mobileQuery.matches) {
+        setMobileHeaderHidden(false);
+        lastScrollY = Math.max(window.scrollY, 0);
+        return;
+      }
+
+      const scrollY = Math.max(window.scrollY, 0);
+      if (scrollY <= 24) setMobileHeaderHidden(false);
+      else if (scrollY > lastScrollY + 5) setMobileHeaderHidden(true);
+      else if (scrollY < lastScrollY - 5) setMobileHeaderHidden(false);
+      lastScrollY = scrollY;
+    };
+
+    const resetForViewport = () => updateHeader();
+    window.addEventListener('scroll', updateHeader, { passive: true });
+    mobileQuery.addEventListener('change', resetForViewport);
+    return () => {
+      window.removeEventListener('scroll', updateHeader);
+      mobileQuery.removeEventListener('change', resetForViewport);
+    };
+  }, []);
+
   const skillRows = useMemo(() => computeSkills(build, data, traitById, sigilById), [build, data, traitById, sigilById]);
   const bonusRows = useMemo(() => computeSummonBonuses(build, data), [build, data]);
   const usedSlots = build.sigils.filter(sigil => sigil.sigilId).length;
 
+  const renderMasteryPoints = (floating = false) => view === 'mastery' && masteryStyles ? (
+    <div
+      className={`header-mastery-points${floating ? ` mobile-mastery-points${mobileHeaderHidden ? ' is-visible' : ''}` : ''}`}
+      aria-label={locale === 'zh' ? '专精点数剩余' : 'Mastery points remaining'}
+      aria-hidden={floating ? !mobileHeaderHidden : undefined}
+    >
+      <span className="header-mastery-points-label">{locale === 'zh' ? '剩余' : 'Left'}</span>
+      {([1, 2, 3, 'EX'] as const).map(rank => {
+        const used = rankActivationCount(build.masterTraits ?? {}, masteryStyles, rank);
+        const remaining = MASTER_RANK_CAPS[String(rank)] - used;
+        return (
+          <span key={String(rank)} className={`header-mastery-point rank-${String(rank).toLowerCase()}${remaining === 0 ? ' empty' : ''}`}>
+            <i>{rank === 1 ? '●' : rank === 2 ? '◆' : rank === 3 ? '⬢' : '⬣'}</i>
+            <small>{rank === 'EX' ? 'EX' : (locale === 'zh' ? `${rank}阶` : `R${rank}`)}</small>
+            <b>{remaining}</b>
+          </span>
+        );
+      })}
+    </div>
+  ) : null;
+
   return (
     <div className="app">
-      <header className="topbar">
+      <header className={`topbar${mobileHeaderHidden ? ' mobile-hidden' : ''}`}>
         <div className="brand">
           <img className="brand-icon" src={`${import.meta.env.BASE_URL}icon.png`} alt="" />
           <span className="brand-copy">
@@ -148,22 +197,7 @@ export default function App() {
           <button className={view === 'build' ? 'seg-on' : ''} onClick={() => setView('build')}>{t('viewBuild')}</button>
           <button className={view === 'mastery' ? 'seg-on' : ''} onClick={() => setView('mastery')}>{t('viewMastery')}</button>
         </div>
-        {view === 'mastery' && masteryStyles && (
-          <div className="header-mastery-points" aria-label={locale === 'zh' ? '专精点数剩余' : 'Mastery points remaining'}>
-            <span className="header-mastery-points-label">{locale === 'zh' ? '剩余' : 'Left'}</span>
-            {([1, 2, 3, 'EX'] as const).map(rank => {
-              const used = rankActivationCount(build.masterTraits ?? {}, masteryStyles, rank);
-              const remaining = MASTER_RANK_CAPS[String(rank)] - used;
-              return (
-                <span key={String(rank)} className={`header-mastery-point rank-${String(rank).toLowerCase()}${remaining === 0 ? ' empty' : ''}`}>
-                  <i>{rank === 1 ? '●' : rank === 2 ? '◆' : rank === 3 ? '⬢' : '⬣'}</i>
-                  <small>{rank === 'EX' ? 'EX' : (locale === 'zh' ? `${rank}阶` : `R${rank}`)}</small>
-                  <b>{remaining}</b>
-                </span>
-              );
-            })}
-          </div>
-        )}
+        {renderMasteryPoints()}
         <div className="build-tools">
           <input className="text-input build-name" value={build.name} onChange={event => setBuild({ ...build, name: event.target.value })} />
           <button className="btn primary" onClick={() => {
@@ -193,6 +227,7 @@ export default function App() {
           </div>
         </div>
       </header>
+      {renderMasteryPoints(true)}
 
       {view === 'build' ? (
         <main className="layout">
