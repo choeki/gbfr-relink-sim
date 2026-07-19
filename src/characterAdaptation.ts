@@ -97,5 +97,7 @@ export function adaptBuildToCharacter(build: Build, targetCharacterId: string, d
     }
   }
 
-  return changed ? { ...build, characterId: targetCharacterId, weapon, sigils } : build;
+  // 专精配置与角色绑定, 切换角色时清空
+  const masterTraits = build.characterId === targetCharacterId ? build.masterTraits : {};
+  return changed ? { ...build, characterId: targetCharacterId, weapon, sigils, masterTraits } : build;
 }

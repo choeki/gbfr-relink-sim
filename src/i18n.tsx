@@ -15,6 +15,9 @@ const messages = {
     all: '全部', basic: '基础', attack: '攻击', defense: '防御', support: '辅助', special: '特殊', role: '角色', plus: '+因子',
     searchName: '搜索名称（中/英）…', noMatch: '没有匹配结果', maxLevel: '上限', wikiFooter: '数据来源：GBF Relink Wiki · 感谢社区资料整理与校对',
     chinese: '中文', english: 'English', cost: '消耗', skillDetail: '技能详情', description: '技能说明', levelEffects: '逐级效果', sources: '等级来源', total: '合计',
+    viewBuild: '因子配装', viewMastery: '专精', mastery: '专精技能', totalActivations: '总激活数',
+    chooseCharacterFirstMastery: '先在“因子配装”页选择角色，再配置专精',
+    masteryHint: '每列对应一种专精类型（✦ 数量与游戏内一致）。勾选节点计入对应阶级的总激活数（1/2/3 阶各 10 点、EX 20 点，共 50 点）；达到所需数量后，对应的专精类型强化会自动激活。中文文本已依据游戏内截图校正。',
   },
   en: {
     appTitle: 'GBF Relink Build Simulator', autoSave: 'Saved locally', save: 'Save Build', load: 'Switch Build…',
@@ -28,6 +31,9 @@ const messages = {
     all: 'All', basic: 'Basic', attack: 'Attack', defense: 'Defense', support: 'Support', special: 'Special', role: 'Character', plus: '+ Sigils',
     searchName: 'Search name (CN/EN)…', noMatch: 'No matching results', maxLevel: 'Max', wikiFooter: 'Data source: GBF Relink Wiki · Thanks to the community for compiling and verifying the data',
     chinese: '中文', english: 'English', cost: 'Cost', skillDetail: 'Skill Details', description: 'Description', levelEffects: 'Level Effects', sources: 'Sources', total: 'Total',
+    viewBuild: 'Build', viewMastery: 'Mastery', mastery: 'Master Traits', totalActivations: 'Activated',
+    chooseCharacterFirstMastery: 'Choose a character on the Build page first',
+    masteryHint: 'Each column is one Master Trait style (✦ marks match the in-game icons). Activated nodes count toward each rank tier (10 for Ranks 1/2/3, 20 for EX, 50 total); reaching the required count activates the Rank Perk. Data from RPG Site.',
   },
 } as const;
 

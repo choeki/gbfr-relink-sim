@@ -148,6 +148,8 @@ export interface Build {
   wrightstone: { defId: string | null; traits: TraitGrant[] };
   sigils: SigilEquip[];
   summons: SummonEquip[];
+  /** 专精技能选择: key 为 `${styleType}:${rank}`(如 Insight:1 / Crux:EX), 值为该池中已激活节点的索引 */
+  masterTraits?: Record<string, number[]>;
 }
 
 export const SUMMON_SLOTS = 4;
@@ -166,6 +168,7 @@ export function emptyBuild(): Build {
     wrightstone: { defId: null, traits: [{ traitId: null, level: 20, traitLocked: true, removable: false }, { traitId: null, level: 15 }, { traitId: null, level: 10 }] },
     sigils: Array.from({ length: SIGIL_SLOTS }, () => ({ sigilId: null, level: 15, secondaryTraitId: null, secondaryLevel: null })),
     summons: Array.from({ length: SUMMON_SLOTS }, emptySummon),
+    masterTraits: {},
   };
 }
 

@@ -7,11 +7,14 @@ import { SigilSlot } from './components/SigilSlot';
 import { WeaponPanel, WrightstonePanel } from './components/Panels';
 import { SummonPanel } from './components/SummonPanel';
 import { CharacterPanel } from './components/CharacterPanel';
+import { MasteryPanel } from './components/MasteryPanel';
 import { computeSkills, computeSummonBonuses, SkillSummary } from './components/SkillSummary';
 import { adaptBuildToCharacter } from './characterAdaptation';
 import { isSummonSubParamAllowed, isSummonTraitAllowed, isWrightstoneTraitAllowed, summonTraitLevel, WRIGHTSTONE_PRIMARY_TRAIT_SET } from './rules';
 import { useI18n } from './i18n';
 import { exportBuildImage } from './exportBuildImage';
+import { exportMasteryImage } from './exportMasteryImage';
+import { getMasterTraitStyles, MASTER_RANK_CAPS, rankActivationCount } from './masterTraits';
 
 const LEGACY_TRAIT_IDS: Record<string, string> = {
   GAME_BLADE_DANCE: 'SKILL_158_00',
@@ -63,9 +66,11 @@ function normalizeBuild(b: Build): Build {
 export default function App() {
   const { locale, setLocale, t } = useI18n();
   const [custom] = useState(loadCustom);
+  const [view, setView] = useState<'build' | 'mastery'>('build');
   const [build, setBuild] = useState<Build>(() => normalizeBuild(loadCurrent() ?? emptyBuild()));
   const [builds, setBuilds] = useState(loadBuilds);
   const [exporting, setExporting] = useState(false);
+  const masteryStyles = getMasterTraitStyles(build.characterId);
   const data = useMemo(() => mergeDataset(custom), [custom]);
   const traitById = useMemo(() => new Map(data.traits.map(trait => [trait.id, trait])), [data]);
   const sigilById = useMemo(() => new Map(data.sigils.map(sigil => [sigil.id, sigil])), [data]);
@@ -139,6 +144,26 @@ export default function App() {
             <span className="brand-sub">{t('autoSave')}</span>
           </span>
         </div>
+        <div className="seg view-switch">
+          <button className={view === 'build' ? 'seg-on' : ''} onClick={() => setView('build')}>{t('viewBuild')}</button>
+          <button className={view === 'mastery' ? 'seg-on' : ''} onClick={() => setView('mastery')}>{t('viewMastery')}</button>
+        </div>
+        {view === 'mastery' && masteryStyles && (
+          <div className="header-mastery-points" aria-label={locale === 'zh' ? '专精点数剩余' : 'Mastery points remaining'}>
+            <span className="header-mastery-points-label">{locale === 'zh' ? '剩余' : 'Left'}</span>
+            {([1, 2, 3, 'EX'] as const).map(rank => {
+              const used = rankActivationCount(build.masterTraits ?? {}, masteryStyles, rank);
+              const remaining = MASTER_RANK_CAPS[String(rank)] - used;
+              return (
+                <span key={String(rank)} className={`header-mastery-point rank-${String(rank).toLowerCase()}${remaining === 0 ? ' empty' : ''}`}>
+                  <i>{rank === 1 ? '●' : rank === 2 ? '◆' : rank === 3 ? '⬢' : '⬣'}</i>
+                  <small>{rank === 'EX' ? 'EX' : (locale === 'zh' ? `${rank}阶` : `R${rank}`)}</small>
+                  <b>{remaining}</b>
+                </span>
+              );
+            })}
+          </div>
+        )}
         <div className="build-tools">
           <input className="text-input build-name" value={build.name} onChange={event => setBuild({ ...build, name: event.target.value })} />
           <button className="btn primary" onClick={() => {
@@ -155,7 +180,8 @@ export default function App() {
           <button className="btn" disabled={exporting} onClick={async () => {
             setExporting(true);
             try {
-              await exportBuildImage({ build, data, traitById, sigilById, skills: skillRows, bonuses: bonusRows, locale });
+              if (view === 'mastery') await exportMasteryImage({ build, data, locale });
+              else await exportBuildImage({ build, data, traitById, sigilById, skills: skillRows, bonuses: bonusRows, locale });
             } finally {
               setExporting(false);
             }
@@ -168,29 +194,35 @@ export default function App() {
         </div>
       </header>
 
-      <main className="layout">
-        <div className="col-left">
-          <CharacterPanel build={build} data={data} onChange={setBuild} />
-          <WeaponPanel build={build} data={data} traitById={traitById} onChange={setBuild} />
-          <WrightstonePanel build={build} data={data} traitById={traitById} onChange={setBuild} />
-        </div>
-        <div className="col-mid">
-          <div className="panel">
-            <div className="panel-title">{t('traits')} <span className="dim">({usedSlots}/{SIGIL_SLOTS})</span></div>
-            <div className="sigil-grid">
-              {build.sigils.map((equip, index) => (
-                <SigilSlot
-                  key={index} index={index} equip={equip} data={data} traitById={traitById} sigilById={sigilById}
-                  characterName={build.characterId ? data.characters.find(character => character.id === build.characterId)?.name ?? null : null}
-                  onChange={next => setBuild({ ...build, sigils: build.sigils.map((item, itemIndex) => itemIndex === index ? next : item) })}
-                />
-              ))}
-            </div>
+      {view === 'build' ? (
+        <main className="layout">
+          <div className="col-left">
+            <CharacterPanel build={build} data={data} onChange={setBuild} />
+            <WeaponPanel build={build} data={data} traitById={traitById} onChange={setBuild} />
+            <WrightstonePanel build={build} data={data} traitById={traitById} onChange={setBuild} />
           </div>
-          <SummonPanel build={build} data={data} traitById={traitById} onChange={setBuild} />
-        </div>
-        <div className="col-right"><SkillSummary rows={skillRows} bonuses={bonusRows} /></div>
-      </main>
+          <div className="col-mid">
+            <div className="panel">
+              <div className="panel-title">{t('traits')} <span className="dim">({usedSlots}/{SIGIL_SLOTS})</span></div>
+              <div className="sigil-grid">
+                {build.sigils.map((equip, index) => (
+                  <SigilSlot
+                    key={index} index={index} equip={equip} data={data} traitById={traitById} sigilById={sigilById}
+                    characterName={build.characterId ? data.characters.find(character => character.id === build.characterId)?.name ?? null : null}
+                    onChange={next => setBuild({ ...build, sigils: build.sigils.map((item, itemIndex) => itemIndex === index ? next : item) })}
+                  />
+                ))}
+              </div>
+            </div>
+            <SummonPanel build={build} data={data} traitById={traitById} onChange={setBuild} />
+          </div>
+          <div className="col-right"><SkillSummary rows={skillRows} bonuses={bonusRows} /></div>
+        </main>
+      ) : (
+        <main className="layout-single">
+          <MasteryPanel build={build} data={data} onChange={setBuild} />
+        </main>
+      )}
 
       <footer className="foot">{t('wikiFooter')}</footer>
     </div>
