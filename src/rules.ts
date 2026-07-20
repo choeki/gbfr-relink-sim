@@ -67,6 +67,15 @@ export const SUMMON_FORBIDDEN_TRAIT_IDS = new Set<string>([
 ]);
 
 /**
+ * Traits that can roll on summons even though they are not valid sigil-primary
+ * traits (canPrimary === false). They are part of the general summon pool, so
+ * they bypass the canPrimary gate in isSummonTraitAllowed.
+ */
+export const SUMMON_SPECIAL_ALLOWED_TRAIT_IDS = new Set<string>([
+  'HASH_F26BAEA5', // Divergence / 分歧
+]);
+
+/**
  * These traits are not guaranteed rolls. They may appear only on the listed
  * summon families, alongside the normal summon trait pool.
  */
@@ -93,7 +102,7 @@ export function isSummonTraitAllowed(trait: {
 }, summonBaseName?: string): boolean {
   const owners = SUMMON_EXCLUSIVE_TRAIT_OWNERS[trait.id];
   return (!owners || (!!summonBaseName && owners.includes(summonBaseName)))
-    && trait.canPrimary
+    && (trait.canPrimary || SUMMON_SPECIAL_ALLOWED_TRAIT_IDS.has(trait.id))
     && !trait.weaponOnly
     && !trait.iconFile?.startsWith('chars/')
     && !SUMMON_FORBIDDEN_TRAIT_IDS.has(trait.id);

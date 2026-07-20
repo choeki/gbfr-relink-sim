@@ -1909,7 +1909,7 @@
    "maxLevel": 15,
    "canPrimary": false,
    "canSecondary": false,
-   "desc": "Automatically recover health over time.\nAlso grants a certain chance to instantly recover from 1 debuff.\nLv1:Recover 0.6% of max HP over time / 1% chance to instantly recover from 1 debuff\nLv15:Recover 2% of max HP over time / 15% chance to instantly recover from 1 debuff",
+   "desc": "HP持续回复。\n回复时有几率解除自身一个弱化效果。\nLv1:回复最大HP的0.6% / 1%的几率解除自身一个弱化效果\nLv15:回复最大HP的2% / 15%的几率解除自身一个弱化效果",
    "iconFile": "Cmn_icskill_04_01.png",
    "category": "support"
   },
