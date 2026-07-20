@@ -1907,8 +1907,8 @@
    "name": "Divergence",
    "nameZh": "分歧",
    "maxLevel": 15,
-   "canPrimary": false,
-   "canSecondary": false,
+   "canPrimary": true,
+   "canSecondary": true,
    "desc": "HP持续回复。\n回复时有几率解除自身一个弱化效果。\nLv1:回复最大HP的0.6% / 1%的几率解除自身一个弱化效果\nLv15:回复最大HP的2% / 15%的几率解除自身一个弱化效果",
    "iconFile": "Cmn_icskill_04_01.png",
    "category": "support"
@@ -2621,6 +2621,22 @@
   }
  ],
  "sigils": [
+  {
+   "id": "GAME_DIVERGENCE",
+   "hash": "0xF26BAEA5",
+   "name": "Divergence",
+   "nameZh": "分歧",
+   "category": "normal",
+   "isPlus": false,
+   "supportsSecondary": true,
+   "allowedLevels": [
+    15
+   ],
+   "defaultLevel": 15,
+   "maxLevel": 15,
+   "primaryTraitId": "HASH_F26BAEA5",
+   "secondaryPool": -1
+  },
   {
    "id": "GEEN_000_24",
    "hash": "0x2D7F2E70",
