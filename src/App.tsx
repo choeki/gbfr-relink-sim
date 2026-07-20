@@ -69,6 +69,7 @@ export default function App() {
   const [view, setView] = useState<'build' | 'mastery'>('build');
   const [build, setBuild] = useState<Build>(() => normalizeBuild(loadCurrent() ?? emptyBuild()));
   const [builds, setBuilds] = useState(loadBuilds);
+  const [selectedBuild, setSelectedBuild] = useState('');
   const [exporting, setExporting] = useState(false);
   const [mobileHeaderHidden, setMobileHeaderHidden] = useState(false);
   const masteryStyles = getMasterTraitStyles(build.characterId);
@@ -203,14 +204,30 @@ export default function App() {
           <button className="btn primary" onClick={() => {
             const name = build.name.trim() || (locale === 'zh' ? '未命名配装' : 'Untitled Build');
             setBuilds({ ...builds, [name]: { ...build, name } });
+            setSelectedBuild(name);
           }}>{t('save')}</button>
-          <select className="text-input" value="" onChange={event => {
-            const saved = builds[event.target.value];
+          <select className="text-input" value={selectedBuild} onChange={event => {
+            const name = event.target.value;
+            setSelectedBuild(name);
+            const saved = builds[name];
             if (saved) setBuild(normalizeBuild(saved));
           }}>
             <option value="">{t('load')}</option>
             {Object.keys(builds).map(name => <option key={name} value={name}>{name}</option>)}
           </select>
+          <button
+            className="btn danger" disabled={!selectedBuild || !builds[selectedBuild]}
+            title={locale === 'zh' ? '删除所选配装' : 'Delete selected build'}
+            onClick={() => {
+              if (!selectedBuild || !builds[selectedBuild]) return;
+              const msg = locale === 'zh' ? `删除配装「${selectedBuild}」？` : `Delete build "${selectedBuild}"?`;
+              if (!confirm(msg)) return;
+              const next = { ...builds };
+              delete next[selectedBuild];
+              setBuilds(next);
+              setSelectedBuild('');
+            }}
+          >{locale === 'zh' ? '删除' : 'Delete'}</button>
           <button className="btn" disabled={exporting} onClick={async () => {
             setExporting(true);
             try {
