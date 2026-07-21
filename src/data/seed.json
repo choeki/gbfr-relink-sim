@@ -780,7 +780,7 @@
    "maxLevel": 15,
    "canPrimary": true,
    "canSecondary": false,
-   "iconFile": "chars/Vane_Avatar.png"
+   "iconFile": "chars/Gran_Avatar.png"
   },
   {
    "id": "SKILL_114_01",
@@ -790,7 +790,7 @@
    "maxLevel": 15,
    "canPrimary": true,
    "canSecondary": false,
-   "iconFile": "chars/Vane_Avatar.png"
+   "iconFile": "chars/Gran_Avatar.png"
   },
   {
    "id": "SKILL_114_02",
@@ -800,7 +800,7 @@
    "maxLevel": 15,
    "canPrimary": true,
    "canSecondary": false,
-   "iconFile": "chars/Vane_Avatar.png"
+   "iconFile": "chars/Gran_Avatar.png"
   },
   {
    "id": "SKILL_115_00",
@@ -1020,7 +1020,7 @@
    "maxLevel": 15,
    "canPrimary": true,
    "canSecondary": false,
-   "iconFile": "chars/Gran_Avatar.png"
+   "iconFile": "chars/Vane_Avatar.png"
   },
   {
    "id": "SKILL_122_01",
@@ -1030,7 +1030,7 @@
    "maxLevel": 15,
    "canPrimary": true,
    "canSecondary": false,
-   "iconFile": "chars/Gran_Avatar.png"
+   "iconFile": "chars/Vane_Avatar.png"
   },
   {
    "id": "SKILL_122_02",
@@ -1040,7 +1040,7 @@
    "maxLevel": 15,
    "canPrimary": true,
    "canSecondary": false,
-   "iconFile": "chars/Gran_Avatar.png"
+   "iconFile": "chars/Vane_Avatar.png"
   },
   {
    "id": "SKILL_123_00",
@@ -3655,7 +3655,7 @@
    "maxLevel": 15,
    "primaryTraitId": "SKILL_114_00",
    "secondaryPool": 1,
-   "nameZh": "英勇神速+"
+   "nameZh": "英勇之魂+"
   },
   {
    "id": "GEEN_114_91",

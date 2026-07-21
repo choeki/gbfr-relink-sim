@@ -74,7 +74,7 @@ export function SigilPicker({ sigils, traitById, characterName, onPick, onClose 
     const filtered = sigils.filter(s => {
       const t = traitById.get(s.primaryTraitId);
       // 选定角色后, 其他角色的专属因子不显示 (专属词条图标为 chars/<角色>_Avatar.png)
-      // 勇士系列为主角专属, 古兰/姬塔通用
+      // 英勇(Fearless)系列为主角专属, 古兰/姬塔通用
       if (characterName) {
         const m = t?.iconFile?.match(/^chars\/(.+?)_Avatar\.png$/);
         if (m) {
